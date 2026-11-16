@@ -37,7 +37,9 @@ export class ReaderApp {
   async openBook(book: StoredBook): Promise<void> {
     this.currentBook = book;
     this.currentEngine = DocumentRegistry.getEngineForFile(book.data, `${book.title}.${book.format}`);
-    await this.currentEngine.load(book.data, `${book.title}.${book.format}`);
+    const meta = await this.currentEngine.load(book.data, `${book.title}.${book.format}`);
+    this.currentBook.title = meta.title;
+    this.currentBook.author = meta.author;
 
     this.renderSkeleton();
     await this.paginateAndRender();

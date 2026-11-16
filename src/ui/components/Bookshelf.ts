@@ -1,6 +1,7 @@
 import { StoredBook, StorageManager } from '../../core/storage/StorageManager';
 import { DocumentRegistry } from '../../core/engine/DocumentRegistry';
 import { createSampleEpub } from '../../assets/sample-book';
+import { normalizeLegacyVietnamese } from '../../core/engine/epub/vietnameseDecoder';
 
 export interface BookshelfOptions {
   onSelectBook: (book: StoredBook) => void;
@@ -42,8 +43,10 @@ export class Bookshelf {
         this.books = [sampleBook];
       }
 
-      // Load progress percentages
+      // Normalize any existing legacy text and load progress percentages
       for (const b of this.books) {
+        b.title = normalizeLegacyVietnamese(b.title);
+        b.author = normalizeLegacyVietnamese(b.author);
         const prog = await StorageManager.getProgress(b.id);
         if (prog) {
           this.progressMap.set(b.id, prog.progressPercent || 0);
