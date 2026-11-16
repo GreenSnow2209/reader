@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+app.setName('Lumina Reader');
+
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow() {
