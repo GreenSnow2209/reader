@@ -1,0 +1,78 @@
+/* Eye-Care Themes and Visual Tokens */
+
+:root {
+  --font-serif: 'Lora', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Cinzel', serif;
+
+  --font-size: 16px;
+  --line-height: 1.65;
+  --font-family: var(--font-serif);
+  --book-margin: 36px;
+}
+
+/* 1. SEPIA THEME (Warm Antique Paper - Eye Care / Low Blue Light) */
+body.theme-sepia {
+  --bg-app: #EDE3CA;
+  --page-bg: #FBF0D9;
+  --text-color: #382D21;
+  --heading-color: #221A12;
+  --cover-bg: #4A2E18;
+  --border-color: rgba(95, 75, 50, 0.12);
+  --surface-toolbar: rgba(246, 232, 195, 0.94);
+  --surface-card: #F3E6C7;
+  --accent-color: #8C531B;
+  --accent-hover: #6D3D10;
+  --shadow-color: rgba(50, 35, 20, 0.2);
+  --selection-bg: #E8D3A7;
+}
+
+/* 2. DARK THEME (Night Owl / OLED Low-Strain) */
+body.theme-dark {
+  --bg-app: #0E0E10;
+  --page-bg: #1B1B1F;
+  --text-color: #D1D1D6;
+  --heading-color: #F0F0F5;
+  --cover-bg: #101014;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --surface-toolbar: rgba(27, 27, 31, 0.94);
+  --surface-card: #25252B;
+  --accent-color: #7B8CDE;
+  --accent-hover: #98A5E8;
+  --shadow-color: rgba(0, 0, 0, 0.6);
+  --selection-bg: #3E4460;
+}
+
+/* 3. LIGHT THEME (Soft Crisp Paper) */
+body.theme-light {
+  --bg-app: #E8ECF2;
+  --page-bg: #FFFFFF;
+  --text-color: #24292E;
+  --heading-color: #111418;
+  --cover-bg: #1E293B;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --surface-toolbar: rgba(255, 255, 255, 0.94);
+  --surface-card: #F8FAFC;
+  --accent-color: #2563EB;
+  --accent-hover: #1D4ED8;
+  --shadow-color: rgba(0, 0, 0, 0.15);
+  --selection-bg: #BFDBFE;
+}
+
+/* Global Body Styling */
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-app);
+  color: var(--text-color);
+  font-family: var(--font-sans);
+  transition: background-color 0.25s ease, color 0.25s ease;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--selection-bg);
+}

@@ -1,0 +1,30 @@
+{
+  "name": "lumina-reader",
+  "version": "1.0.0",
+  "description": "Modular cross-platform book reader with realistic 3D page flip animation",
+  "main": "dist-electron/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "electron:dev": "vite build && tsc -p tsconfig.electron.json && electron --no-sandbox .",
+    "electron:start": "electron --no-sandbox ."
+  },
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "lucide": "^1.16.0",
+    "page-flip": "^2.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.11.0",
+    "electron": "^41.2.0",
+    "happy-dom": "^17.4.5",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.1",
+    "vitest": "^3.0.8"
+  }
+}
