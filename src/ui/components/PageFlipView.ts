@@ -40,12 +40,16 @@ export class PageFlipView {
     // Measure container size
     const containerRect = this.container.getBoundingClientRect();
     const width = containerRect.width > 0 ? containerRect.width : window.innerWidth;
-    const height = containerRect.height > 0 ? containerRect.height : window.innerHeight - 100;
+    const height = containerRect.height > 0 ? containerRect.height : window.innerHeight - 80;
 
-    const isWide = width >= 900 && (this.options.isDualPage ?? true);
-    // Page dimensions
-    const pageWidth = isWide ? Math.floor(width / 2) - 24 : Math.floor(width) - 24;
-    const pageHeight = Math.floor(height) - 30;
+    // Strict adaptive condition: only use 2 pages if screen is truly wide (>= 1020px) AND landscape ratio AND enabled
+    const isDual = width >= 1020 && width >= height * 1.15 && (this.options.isDualPage ?? false);
+
+    // Book page dimensions: fill available space comfortably
+    const pageWidth = isDual
+      ? Math.min(620, Math.max(340, Math.floor((width * 0.94) / 2)))
+      : Math.min(740, Math.max(340, Math.floor(width * 0.90)));
+    const pageHeight = Math.max(400, Math.floor(height * 0.94));
 
     this.container.innerHTML = `
       <div class="flip-book-wrapper">
@@ -75,7 +79,7 @@ export class PageFlipView {
         ${page.htmlContent}
         <div class="page-footer">
           <span class="progress-label">${Math.round((page.pageNumber / this.pages.length) * 100)}%</span>
-          <span class="page-number">${page.pageNumber}</span>
+          <span class="page-number">Trang ${page.pageNumber}</span>
         </div>
         <div class="curl-hint"></div>
       `;
@@ -85,16 +89,16 @@ export class PageFlipView {
 
     try {
       this.pageFlip = new PageFlip(this.flipContainer, {
-        width: Math.max(280, pageWidth),
-        height: Math.max(380, pageHeight),
+        width: pageWidth,
+        height: pageHeight,
         size: 'stretch',
-        minWidth: 260,
+        minWidth: isDual ? 260 : Math.floor(width) + 20, // Forces 1-page portrait mode when single-page
         maxWidth: 1600,
         minHeight: 350,
         maxHeight: 2000,
         drawShadow: true,
-        flippingTime: 600,
-        usePortrait: !isWide,
+        flippingTime: 500,
+        usePortrait: !isDual,
         startZIndex: 5,
         autoSize: true,
         maxShadowOpacity: 0.35,

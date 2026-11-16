@@ -61,6 +61,7 @@ export class ReaderApp {
             </div>
           </div>
           <div class="reader-nav-right">
+            <button class="btn-icon" id="btn-toggle-spread" title="Chế độ trang">📄</button>
             <button class="btn-icon" id="btn-open-toc" title="Mục lục">📑</button>
             <button class="btn-icon" id="btn-toggle-bm" title="Đánh dấu trang này">🔖</button>
             <button class="btn-icon" id="btn-open-search" title="Tìm kiếm">🔍</button>
@@ -95,6 +96,12 @@ export class ReaderApp {
     this.container.querySelector('#btn-back-shelf')?.addEventListener('click', () => {
       this.destroy();
       this.options.onBackToShelf();
+    });
+
+    this.container.querySelector('#btn-toggle-spread')?.addEventListener('click', () => {
+      const current = this.themeManager.getSettings().isDualPage;
+      this.themeManager.setDualPage(!current);
+      this.paginateAndRender(false);
     });
 
     this.container.querySelector('#btn-open-toc')?.addEventListener('click', () => {
@@ -169,16 +176,37 @@ export class ReaderApp {
     const rect = viewportEl.getBoundingClientRect();
     const settings = this.themeManager.getSettings();
 
-    const isDual = (rect.width >= 900) && settings.isDualPage;
+    const width = rect.width > 0 ? rect.width : window.innerWidth;
+    const height = rect.height > 0 ? rect.height : window.innerHeight - 80;
+
+    // Dual page mode requires wide window (>= 1020px) AND landscape aspect ratio AND user setting
+    const isDual = width >= 1020 && width >= height * 1.15 && settings.isDualPage;
+
+    // Update spread button icon
+    const spreadBtn = this.container.querySelector('#btn-toggle-spread');
+    if (spreadBtn) {
+      spreadBtn.textContent = isDual ? '📖' : '📄';
+      spreadBtn.setAttribute(
+        'title',
+        isDual
+          ? 'Đang ở chế độ 2 trang (Bấm để chuyển về 1 trang)'
+          : 'Đang ở chế độ 1 trang (Bấm để chuyển sang 2 trang)'
+      );
+    }
+
+    const pageWidth = isDual
+      ? Math.min(620, Math.max(340, Math.floor((width * 0.94) / 2)))
+      : Math.min(740, Math.max(340, Math.floor(width * 0.90)));
+    const pageHeight = Math.max(400, Math.floor(height * 0.94));
 
     const paginationConfig = {
-      viewportWidth: rect.width > 0 ? rect.width : window.innerWidth,
-      viewportHeight: rect.height > 0 ? rect.height : window.innerHeight - 112,
+      viewportWidth: pageWidth,
+      viewportHeight: pageHeight,
       fontSize: settings.fontSize,
       lineHeight: settings.lineHeight,
       margin: settings.margin,
-      fontFamily: settings.fontFamily === 'serif' ? 'Lora, serif' : 'system-ui, sans-serif',
-      isDualPage: isDual,
+      fontFamily: settings.fontFamily === 'serif' ? 'Merriweather, serif' : 'Inter, sans-serif',
+      isDualPage: false, // Each page is pre-sized to individual page dimensions
     };
 
     let targetPage = 1;
@@ -198,12 +226,16 @@ export class ReaderApp {
 
     this.pages = await this.currentEngine.paginate(paginationConfig);
 
-    if (!this.pageFlipView) {
-      this.pageFlipView = new PageFlipView(viewportEl, {
-        isDualPage: isDual,
-        onPageChange: (p, t) => this.handlePageChanged(p, t),
-      });
+    // Reinitialize PageFlipView with the updated isDual setting
+    if (this.pageFlipView) {
+      this.pageFlipView.destroy();
+      this.pageFlipView = null;
     }
+
+    this.pageFlipView = new PageFlipView(viewportEl, {
+      isDualPage: isDual,
+      onPageChange: (p, t) => this.handlePageChanged(p, t),
+    });
 
     this.pageFlipView.setPages(this.pages, targetPage);
     this.updateSliderAndIndicators(targetPage, this.pages.length);

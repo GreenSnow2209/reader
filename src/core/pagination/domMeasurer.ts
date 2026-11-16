@@ -16,6 +16,7 @@ export class DomMeasurer {
     if (!this.measurementContainer) {
       this.measurementContainer = document.createElement('div');
       this.measurementContainer.id = 'lumina-measurer';
+      this.measurementContainer.className = 'virtual-page-body';
       this.measurementContainer.style.position = 'absolute';
       this.measurementContainer.style.visibility = 'hidden';
       this.measurementContainer.style.left = '-9999px';
@@ -39,7 +40,7 @@ export class DomMeasurer {
 
     // In a browser with real layout engine:
     if (container && container.style && typeof window !== 'undefined' && typeof window.getComputedStyle === 'function') {
-      container.style.width = `${Math.max(200, availableWidth)}px`;
+      container.style.width = `${Math.max(180, availableWidth)}px`;
       container.style.fontSize = `${config.fontSize}px`;
       container.style.lineHeight = `${config.lineHeight}`;
       container.style.fontFamily = config.fontFamily;
@@ -47,20 +48,19 @@ export class DomMeasurer {
 
       const rect = container.getBoundingClientRect();
       if (rect.height > 0) {
-        return Math.ceil(rect.height) + 16; // Add margin bottom
+        return Math.ceil(rect.height) + 14; // margin bottom
       }
     }
 
     // Fallback analytical calculation:
-    // Average character width is ~0.55 of font size for proportional serif/sans fonts
-    const avgCharWidth = config.fontSize * 0.52;
-    const charsPerLine = Math.max(20, Math.floor(availableWidth / avgCharWidth));
+    // Vietnamese text with diacritics occupies ~0.58 of font size
+    const avgCharWidth = config.fontSize * 0.58;
+    const charsPerLine = Math.max(16, Math.floor(availableWidth / avgCharWidth));
     const lines = Math.max(1, Math.ceil(text.length / charsPerLine));
     const lineHeightPx = config.fontSize * config.lineHeight;
 
-    // Heading tags get extra height
     const isHeading = /<h[1-6]/i.test(html);
-    const extraMargin = isHeading ? config.fontSize * 1.5 : 16;
+    const extraMargin = isHeading ? config.fontSize * 1.5 : 14;
 
     return Math.ceil(lines * lineHeightPx + extraMargin);
   }
@@ -69,10 +69,10 @@ export class DomMeasurer {
    * Calculates maximum inner page dimensions based on viewport and configuration.
    */
   static getPageInnerDimensions(config: PaginationConfig): { width: number; height: number } {
-    const rawWidth = config.isDualPage ? config.viewportWidth / 2 : config.viewportWidth;
-    const innerWidth = Math.max(260, rawWidth - config.margin * 2 - 24);
-    // Reserve ~90px for reader header, chapter title, page numbers, and margin
-    const innerHeight = Math.max(300, config.viewportHeight - config.margin * 2 - 96);
+    // Inner width subtracts left & right page padding (32px * 2 = 64px)
+    const innerWidth = Math.max(200, config.viewportWidth - 64);
+    // Non-body height: header(34px) + footer(34px) + padding(48px) + safety buffer(30px) = 146px
+    const innerHeight = Math.max(220, config.viewportHeight - 146);
 
     return {
       width: Math.floor(innerWidth),

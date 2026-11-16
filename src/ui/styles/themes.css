@@ -1,14 +1,14 @@
 /* Eye-Care Themes and Visual Tokens */
 
 :root {
-  --font-serif: 'Lora', Georgia, serif;
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Cinzel', serif;
+  --font-serif: 'Merriweather', 'Charter', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: var(--font-serif);
 
-  --font-size: 16px;
-  --line-height: 1.65;
+  --font-size: 15px;
+  --line-height: 1.6;
   --font-family: var(--font-serif);
-  --book-margin: 36px;
+  --book-margin: 28px;
 }
 
 /* 1. SEPIA THEME (Warm Antique Paper - Eye Care / Low Blue Light) */

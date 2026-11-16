@@ -116,8 +116,8 @@ export class ThemeManager {
 
     const fontVal =
       this.settings.fontFamily === 'serif'
-        ? "'Lora', Georgia, serif"
-        : "'Plus Jakarta Sans', system-ui, sans-serif";
+        ? "'Merriweather', 'Charter', Georgia, serif"
+        : "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
     root.style.setProperty('--font-family', fontVal);
   }
 }

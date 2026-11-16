@@ -23,13 +23,13 @@
   background-color: var(--page-bg, #FBF0D9);
   color: var(--text-color, #382d21);
   box-sizing: border-box;
-  padding: 36px 42px;
+  padding: 24px 32px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
   position: relative;
-  font-family: var(--font-family, 'Lora', serif);
+  font-family: var(--font-family, 'Merriweather', serif);
   border-right: 1px solid rgba(0, 0, 0, 0.05);
   box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.02);
 }
@@ -49,51 +49,52 @@
 .page.--hard {
   background: var(--cover-bg, #4A2E18);
   color: #FBF0D9;
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-display);
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
 }
 
 .page-header {
-  height: 24px;
+  height: 20px;
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   opacity: 0.55;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.06));
-  margin-bottom: 18px;
+  margin-bottom: 14px;
+  flex-shrink: 0;
 }
 
 .page-footer {
-  height: 24px;
+  height: 20px;
   font-size: 12px;
   opacity: 0.6;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.06));
-  margin-top: 18px;
+  margin-top: 14px;
+  flex-shrink: 0;
 }
 
 .virtual-page-body {
   flex: 1;
   overflow: hidden;
-  font-size: var(--font-size, 16px);
+  font-size: var(--font-size, 15px);
   line-height: var(--line-height, 1.6);
-  text-align: justify;
-  text-justify: inter-word;
+  text-align: left;
   word-break: break-word;
 }
 
 .virtual-page-body h1,
 .virtual-page-body h2,
 .virtual-page-body h3 {
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-display);
   margin-top: 0;
   margin-bottom: 14px;
-  line-height: 1.3;
+  line-height: 1.35;
   color: var(--heading-color, #221a12);
 }
 
