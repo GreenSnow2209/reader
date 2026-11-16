@@ -172,11 +172,11 @@ export class ReaderApp {
     const rect = viewportEl.getBoundingClientRect();
     const settings = this.themeManager.getSettings();
 
-    const width = rect.width > 0 ? rect.width : window.innerWidth;
-    const height = rect.height > 0 ? rect.height : window.innerHeight - 104;
+    const availWidth = rect.width > 0 ? rect.width : window.innerWidth;
+    const availHeight = rect.height > 0 ? rect.height : window.innerHeight - 104;
 
-    // Dual page mode requires wide window (>= 1020px) AND landscape aspect ratio AND user setting
-    const isDual = width >= 1020 && width >= height * 1.15 && settings.isDualPage;
+    // Dual page mode requires wide window (>= 1050px) AND landscape aspect ratio AND user setting
+    const isDual = availWidth >= 1050 && availWidth >= availHeight * 1.15 && settings.isDualPage;
 
     // Update spread button icon
     const spreadBtn = this.container.querySelector('#btn-toggle-spread');
@@ -190,10 +190,13 @@ export class ReaderApp {
       );
     }
 
+    const pageHeight = Math.max(450, Math.floor(availHeight * 0.88));
+    const maxSingleWidth = Math.floor(availWidth * 0.88);
+    const maxDualWidth = Math.floor((availWidth * 0.94) / 2);
+
     const pageWidth = isDual
-      ? Math.min(620, Math.max(320, Math.floor((width * 0.94) / 2)))
-      : Math.min(740, Math.max(320, Math.floor(width * 0.92)));
-    const pageHeight = Math.max(380, Math.floor(height * 0.92));
+      ? Math.min(maxDualWidth, Math.max(340, Math.floor(pageHeight * 0.72)))
+      : Math.min(maxSingleWidth, Math.max(340, Math.floor(pageHeight * 0.72)));
 
     const paginationConfig = {
       viewportWidth: pageWidth,

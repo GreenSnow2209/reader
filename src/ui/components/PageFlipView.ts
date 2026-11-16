@@ -39,17 +39,20 @@ export class PageFlipView {
 
     // Measure container size
     const containerRect = this.container.getBoundingClientRect();
-    const width = containerRect.width > 0 ? containerRect.width : window.innerWidth;
-    const height = containerRect.height > 0 ? containerRect.height : window.innerHeight - 104;
+    const availWidth = containerRect.width > 0 ? containerRect.width : window.innerWidth;
+    const availHeight = containerRect.height > 0 ? containerRect.height : window.innerHeight - 104;
 
-    // Strict adaptive condition: only use 2 pages if screen is truly wide (>= 1020px) AND landscape ratio AND enabled
-    const isDual = width >= 1020 && width >= height * 1.15 && (this.options.isDualPage ?? false);
+    // Strict adaptive condition: only use 2 pages if screen is truly wide (>= 1050px) AND landscape ratio AND enabled
+    const isDual = availWidth >= 1050 && availWidth >= availHeight * 1.15 && (this.options.isDualPage ?? false);
 
-    // Book page dimensions: fill available space comfortably
+    // Standard book proportions: occupy ~88% of available viewport height
+    const pageHeight = Math.max(450, Math.floor(availHeight * 0.88));
+    const maxSingleWidth = Math.floor(availWidth * 0.88);
+    const maxDualWidth = Math.floor((availWidth * 0.94) / 2);
+
     const pageWidth = isDual
-      ? Math.min(620, Math.max(320, Math.floor((width * 0.94) / 2)))
-      : Math.min(740, Math.max(320, Math.floor(width * 0.92)));
-    const pageHeight = Math.max(380, Math.floor(height * 0.92));
+      ? Math.min(maxDualWidth, Math.max(340, Math.floor(pageHeight * 0.72)))
+      : Math.min(maxSingleWidth, Math.max(340, Math.floor(pageHeight * 0.72)));
 
     this.container.innerHTML = `
       <div class="flip-book-wrapper">
@@ -59,6 +62,11 @@ export class PageFlipView {
 
     this.flipContainer = this.container.querySelector('#book-viewport');
     if (!this.flipContainer) return;
+
+    // Set explicit size on flipContainer so PageFlip centers cleanly with no negative offset
+    const totalBookWidth = isDual ? pageWidth * 2 : pageWidth;
+    this.flipContainer.style.width = `${totalBookWidth}px`;
+    this.flipContainer.style.height = `${pageHeight}px`;
 
     // Build Page elements
     this.pages.forEach((page, idx) => {
@@ -91,16 +99,16 @@ export class PageFlipView {
       this.pageFlip = new PageFlip(this.flipContainer, {
         width: pageWidth,
         height: pageHeight,
-        size: 'stretch',
-        minWidth: isDual ? 260 : Math.floor(width) + 20, // Forces 1-page portrait mode when single-page
-        maxWidth: 1600,
-        minHeight: 350,
-        maxHeight: 2000,
+        size: 'fixed',
+        minWidth: pageWidth,
+        maxWidth: pageWidth,
+        minHeight: pageHeight,
+        maxHeight: pageHeight,
         drawShadow: true,
-        flippingTime: 500,
+        flippingTime: 450,
         usePortrait: !isDual,
         startZIndex: 5,
-        autoSize: true,
+        autoSize: false,
         maxShadowOpacity: 0.35,
         showCover: true,
         mobileScrollSupport: false,
