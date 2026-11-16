@@ -161,10 +161,6 @@ export class ReaderApp {
     if (this.currentBook && this.currentEngine) {
       this.sidebarDrawer.setBookData(this.currentBook.id, this.currentEngine.getToc());
     }
-
-    // Auto-hide toolbar on inactive mouse
-    const readerContainer = this.container.querySelector('.reader-container');
-    readerContainer?.addEventListener('mousemove', () => this.showToolbarTemporarily());
   }
 
   private async paginateAndRender(restoreProgress = true): Promise<void> {
@@ -177,7 +173,7 @@ export class ReaderApp {
     const settings = this.themeManager.getSettings();
 
     const width = rect.width > 0 ? rect.width : window.innerWidth;
-    const height = rect.height > 0 ? rect.height : window.innerHeight - 80;
+    const height = rect.height > 0 ? rect.height : window.innerHeight - 104;
 
     // Dual page mode requires wide window (>= 1020px) AND landscape aspect ratio AND user setting
     const isDual = width >= 1020 && width >= height * 1.15 && settings.isDualPage;
@@ -195,9 +191,9 @@ export class ReaderApp {
     }
 
     const pageWidth = isDual
-      ? Math.min(620, Math.max(340, Math.floor((width * 0.94) / 2)))
-      : Math.min(740, Math.max(340, Math.floor(width * 0.90)));
-    const pageHeight = Math.max(400, Math.floor(height * 0.94));
+      ? Math.min(620, Math.max(320, Math.floor((width * 0.94) / 2)))
+      : Math.min(740, Math.max(320, Math.floor(width * 0.92)));
+    const pageHeight = Math.max(380, Math.floor(height * 0.92));
 
     const paginationConfig = {
       viewportWidth: pageWidth,
@@ -326,28 +322,6 @@ export class ReaderApp {
 
     top?.classList.toggle('--hidden', !this.isToolbarVisible);
     bottom?.classList.toggle('--hidden', !this.isToolbarVisible);
-  }
-
-  private showToolbarTemporarily(): void {
-    if (!this.isToolbarVisible) {
-      this.isToolbarVisible = true;
-      this.container.querySelector('#reader-toolbar-top')?.classList.remove('--hidden');
-      this.container.querySelector('#reader-toolbar-bottom')?.classList.remove('--hidden');
-    }
-
-    if (this.hideToolbarTimer) {
-      window.clearTimeout(this.hideToolbarTimer);
-    }
-
-    this.hideToolbarTimer = window.setTimeout(() => {
-      // Only auto-hide if drawer is not open
-      const drawerOpen = this.container.querySelector('.sidebar-drawer.--open');
-      if (!drawerOpen) {
-        this.container.querySelector('#reader-toolbar-top')?.classList.add('--hidden');
-        this.container.querySelector('#reader-toolbar-bottom')?.classList.add('--hidden');
-        this.isToolbarVisible = false;
-      }
-    }, 4000);
   }
 
   private toggleFullscreen(): void {

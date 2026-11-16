@@ -40,16 +40,16 @@ export class PageFlipView {
     // Measure container size
     const containerRect = this.container.getBoundingClientRect();
     const width = containerRect.width > 0 ? containerRect.width : window.innerWidth;
-    const height = containerRect.height > 0 ? containerRect.height : window.innerHeight - 80;
+    const height = containerRect.height > 0 ? containerRect.height : window.innerHeight - 104;
 
     // Strict adaptive condition: only use 2 pages if screen is truly wide (>= 1020px) AND landscape ratio AND enabled
     const isDual = width >= 1020 && width >= height * 1.15 && (this.options.isDualPage ?? false);
 
     // Book page dimensions: fill available space comfortably
     const pageWidth = isDual
-      ? Math.min(620, Math.max(340, Math.floor((width * 0.94) / 2)))
-      : Math.min(740, Math.max(340, Math.floor(width * 0.90)));
-    const pageHeight = Math.max(400, Math.floor(height * 0.94));
+      ? Math.min(620, Math.max(320, Math.floor((width * 0.94) / 2)))
+      : Math.min(740, Math.max(320, Math.floor(width * 0.92)));
+    const pageHeight = Math.max(380, Math.floor(height * 0.92));
 
     this.container.innerHTML = `
       <div class="flip-book-wrapper">
