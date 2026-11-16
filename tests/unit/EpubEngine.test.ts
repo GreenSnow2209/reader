@@ -111,4 +111,48 @@ describe('EpubEngine', () => {
     expect(searchResults.length).toBe(2);
     expect(searchResults[0].chapterTitle).toContain('Cánh Diều Tuổi Thơ');
   });
+
+  it('automatically detects and normalizes legacy composite Vietnamese EPUBs', async () => {
+    const zip = new JSZip();
+    zip.file('mimetype', 'application/epub+zip');
+    zip.file(
+      'META-INF/container.xml',
+      `<?xml version="1.0"?>
+      <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+        <rootfiles>
+          <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
+        </rootfiles>
+      </container>`
+    );
+    zip.file(
+      'content.opf',
+      `<?xml version="1.0" encoding="utf-8"?>
+      <package xmlns="http://www.idpf.org/2007/opf" version="2.0">
+        <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+          <dc:title>Ai lêëy miïëng pho maát cuãa töi?</dc:title>
+          <dc:creator>Spencer Johnson</dc:creator>
+        </metadata>
+        <manifest>
+          <item id="c1" href="chap1.html" media-type="text/html"/>
+        </manifest>
+        <spine>
+          <itemref idref="c1"/>
+        </spine>
+      </package>`
+    );
+    zip.file(
+      'chap1.html',
+      `<html><body><h1>Lúâi giúái thiïåu cuãa Tiïën sô</h1><p>Spencer Johnson àûúåc bònh choån laâ möåt trong nhûäng cêy buát coá aãnh hûúãng lúán nhêët.</p></body></html>`
+    );
+
+    const data = await zip.generateAsync({ type: 'arraybuffer' });
+    const engine = new EpubEngine();
+    const meta = await engine.load(data, 'legacy.epub');
+
+    expect(meta.title).toBe('Ai lấy miếng pho mát của tôi?');
+    const chaps = engine.getChapters();
+    expect(chaps[0].title).toBe('Lời giới thiệu của Tiến sĩ');
+    expect(chaps[0].html).toContain('Spencer Johnson được bình chọn là một trong những cây bút có ảnh hưởng lớn nhất.');
+    expect(chaps[0].plainText).toContain('Lời giới thiệu của Tiến sĩ');
+  });
 });

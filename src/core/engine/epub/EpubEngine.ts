@@ -15,6 +15,7 @@ import {
   parseXml,
   resolveRelativePath,
 } from './xmlUtils';
+import { normalizeLegacyVietnamese } from './vietnameseDecoder';
 import { PaginationEngine } from '../../pagination/PaginationEngine';
 
 export class EpubEngine implements DocumentEngine {
@@ -75,11 +76,16 @@ export class EpubEngine implements DocumentEngine {
     const opfDoc = parseXml(opfXml);
 
     // 3. Extract Metadata
-    const title = getElementText(opfDoc, 'title') || fileName.replace(/\.epub$/i, '');
-    const author = getElementText(opfDoc, 'creator') || 'Tác giả không xác định';
+    const title = normalizeLegacyVietnamese(
+      getElementText(opfDoc, 'title') || fileName.replace(/\.epub$/i, '')
+    );
+    const author = normalizeLegacyVietnamese(
+      getElementText(opfDoc, 'creator') || 'Tác giả không xác định'
+    );
     const language = getElementText(opfDoc, 'language') || 'vi';
     const publisher = getElementText(opfDoc, 'publisher') || undefined;
-    const description = getElementText(opfDoc, 'description') || undefined;
+    const rawDesc = getElementText(opfDoc, 'description') || undefined;
+    const description = rawDesc ? normalizeLegacyVietnamese(rawDesc) : undefined;
 
     // 4. Manifest map (id -> { href, mediaType, properties })
     const manifestItems = opfDoc.querySelectorAll('manifest item');
@@ -163,17 +169,20 @@ export class EpubEngine implements DocumentEngine {
       if (!chapterFile) continue;
 
       const rawContent = await chapterFile.async('text');
+      const normalizedContent = normalizeLegacyVietnamese(rawContent);
       const chapterDir = href.includes('/') ? href.substring(0, href.lastIndexOf('/')) : '';
-      const processedHtml = await this.processChapterHtml(rawContent, chapterDir);
+      const processedHtml = await this.processChapterHtml(normalizedContent, chapterDir);
 
       // Create fallback title from TOC or chapter index
       const matchedToc = this.toc.find((t) => t.href.includes(href) || href.includes(t.href));
       const chapterDoc = parseXml(processedHtml);
       const headerTitle =
         chapterDoc.querySelector('h1, h2, h3, title')?.textContent?.trim() || '';
-      const chapterTitle = matchedToc?.title || headerTitle || `Chương ${i + 1}`;
+      const rawChapterTitle = matchedToc?.title || headerTitle || `Chương ${i + 1}`;
+      const chapterTitle = normalizeLegacyVietnamese(rawChapterTitle);
 
-      const plainText = chapterDoc.body?.textContent?.replace(/\s+/g, ' ').trim() || '';
+      const chapterBody = chapterDoc.querySelector('body') || chapterDoc.documentElement;
+      const plainText = chapterBody?.textContent?.replace(/\s+/g, ' ').trim() || '';
 
       this.chapters.push({
         id: `chap-${i + 1}`,
@@ -183,6 +192,11 @@ export class EpubEngine implements DocumentEngine {
         plainText,
       });
     }
+
+    // Normalize any TOC titles that were parsed
+    this.toc.forEach((item) => {
+      item.title = normalizeLegacyVietnamese(item.title);
+    });
 
     // If TOC is still empty, synthesize TOC from chapter headers
     if (this.toc.length === 0) {
@@ -242,7 +256,8 @@ export class EpubEngine implements DocumentEngine {
       }
     }
 
-    return doc.body?.innerHTML || htmlString;
+    const bodyEl = doc.querySelector('body') || doc.documentElement;
+    return bodyEl ? bodyEl.innerHTML : htmlString;
   }
 
   getToc(): TocItem[] {
