@@ -8,6 +8,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:electron": "tsc -p tsconfig.electron.json",
+    "build:android": "bun run build && cap sync android",
+    "build:apk": "bun run build && cap sync android && docker run --rm -v $(pwd):/workspace -w /workspace/android -e GRADLE_USER_HOME=/tmp/.gradle lumina-android-builder:latest bash -c './gradlew assembleDebug --no-daemon && chown -R $(id -u):$(id -g) /workspace/android' && mkdir -p release && cp android/app/build/outputs/apk/debug/app-debug.apk release/lumina-reader-android.apk",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -15,11 +17,14 @@
     "electron:start": "electron --no-sandbox ."
   },
   "dependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
     "jszip": "^3.10.1",
     "lucide": "^1.16.0",
     "page-flip": "^2.0.7"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.6.2",
     "@types/node": "^24.11.0",
     "electron": "^41.2.0",
     "happy-dom": "^17.4.5",

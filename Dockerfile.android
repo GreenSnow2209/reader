@@ -1,0 +1,3 @@
+FROM ghcr.io/cirruslabs/android-sdk:34
+
+RUN yes | sdkmanager "platforms;android-36" "build-tools;35.0.0"
